@@ -36,15 +36,126 @@
         aspect-ratio: 8.1;
     }
 </style>
+<style>
+    /* 基础重置 */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    /* 全屏容器 */
+    .loader-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        z-index: 9999;
+        transition: opacity 0.3s ease;
+    }
+
+    /* 加载文字 */
+    .loading-text {
+        margin-top: 20px;
+        color: #ffffff;
+        font-family: 'Arial', sans-serif;
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+    }
+
+    /* 动画效果1: 旋转方块 */
+    .spinner {
+        width: 50px;
+        height: 50px;
+        animation: rotate 1s linear infinite;
+    }
+
+    .spinner rect {
+        fill: none;
+        stroke: #3498db;
+        stroke-width: 4;
+        stroke-linecap: round;
+        stroke-dasharray: 100;
+        animation: dash 1s ease-in-out infinite;
+    }
+
+    /* 动画效果2: 脉冲圆点 */
+    .pulse-loader {
+        display: flex;
+        gap: 12px;
+    }
+
+    .pulse-dot {
+        width: 16px;
+        height: 16px;
+        background: #e74c3c;
+        border-radius: 50%;
+        animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    .pulse-dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .pulse-dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    /* 动画关键帧 */
+    @keyframes rotate {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    @keyframes dash {
+        0% {
+            stroke-dashoffset: 100;
+        }
+
+        50% {
+            stroke-dashoffset: 25;
+            transform: rotate(135deg);
+        }
+
+        100% {
+            stroke-dashoffset: 100;
+            transform: rotate(450deg);
+        }
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.4);
+        }
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+        .spinner {
+            width: 40px;
+            height: 40px;
+        }
+
+        .loading-text {
+            font-size: 1rem;
+        }
+    }
+</style>
 
 <body>
-    <div id="install-container" class="hidden">
-        <div class="install-progress">
-          <div class="progress-bar"></div>
-        </div>
-        <div class="status-text">準備安裝...</div>
-        <button id="cancel-install" class="btn">取消</button>
-      </div>
     <div class="flex-row flex-center" style="width: 100%;">
         <div class="flex-column flex-center" style="position: relative;max-width: 750px;">
             <img style="object-fit: cover;width: 100%;" src="./img/android.png" alt="">
@@ -53,180 +164,66 @@
                 onclick="downloadClick()">
             </div>
         </div>
-        <script>
-            let deferredPrompt;
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
+    </div>
+    <div class="loader-container" id="loader2" style="display: none;">
+        <div class="pulse-loader">
+            <div class="pulse-dot"></div>
+            <div class="pulse-dot"></div>
+            <div class="pulse-dot"></div>
+        </div>
+        <div class="loading-text">Instanlling...</div>
+    </div>
+    <script>
+        function closeLoader() {
+            document.getElementById('loader2').style.display = 'none';
+        }
+        // 切换不同动画的示例
+        function showLoader() {
+            const loaders = document.querySelectorAll('.loader-container');
+            loaders.forEach(loader => loader.style.display = 'none');
+            document.getElementById(`loader2`).style.display = 'flex';
+        }
+    </script>
+    <script>
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+        function downloadClick() {
+            if (!deferredPrompt) {
+                return;
+            }
+            if (deferredPrompt == undefined) {
+                return;
+            }
+            deferredPrompt.prompt();
+            // 监听实际安装完成事件
+            window.addEventListener('appinstalled', () => {
+                console.log('PWA 已成功安装到设备');
+                // 这里执行安装成功后的操作
+                // trackInstallationSuccess();
+                closeLoader();
             });
-            function downloadClick() {
-                if (!deferredPrompt) {
-                    return;
+            deferredPrompt.userChoice.then((choice) => {
+                if (choice.outcome === 'accepted') {
+                    showLoader();
+                    window.alert('MARB installed.');
+                } else {
+                    console.log('User cancelled home screen install.');
                 }
-                if (deferredPrompt == undefined) {
-                    return;
-                }
-                deferredPrompt.prompt();
-                // 监听实际安装完成事件
-                window.addEventListener('appinstalled', () => {
-                    console.log('PWA 已成功安装到设备');
-                    // 这里执行安装成功后的操作
-                    trackInstallationSuccess();
-                });
-                deferredPrompt.userChoice.then((choice) => {
-                    if (choice.outcome === 'accepted') {
-                        window.alert('MARB installed.');
-                    } else {
-                        console.log('User cancelled home screen install.');
-                    }
-                    // deferredPrompt = null; // 重置提示变量。
-                });
+                // deferredPrompt = null; // 重置提示变量。
+            });
+        }
+
+        // 安装成功跟踪函数
+        function trackInstallationSuccess() {
+            // 验证是否已安装
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+
             }
-
-            // 安装成功跟踪函数
-            function trackInstallationSuccess() {
-                // 验证是否已安装
-                if (window.matchMedia('(display-mode: standalone)').matches) {
-
-                }
-            }
-        </script>
-        <script>
-            // JavaScript 邏輯
-            class PWAInstaller {
-                constructor() {
-                    this.deferredPrompt = null;
-                    this.installState = 'idle'; // 狀態機: idle|preparing|installing|done|error
-                    this.progress = 0;
-                    this.timeoutId = null;
-
-                    this.initEvents();
-                }
-
-                initEvents() {
-                    window.addEventListener('beforeinstallprompt', (e) => {
-                        e.preventDefault();
-                        this.deferredPrompt = e;
-                        this.showInstallButton(); // 顯示安裝按鈕
-                    });
-
-                    window.addEventListener('appinstalled', () => {
-                        this.handleInstallSuccess();
-                    });
-
-                    document.getElementById('cancel-install').addEventListener('click', () => {
-                        this.cancelInstall();
-                    });
-                }
-
-                async startInstall() {
-                    try {
-                        this.updateUI('preparing', 0);
-
-                        // 觸發安裝提示
-                        this.deferredPrompt.prompt();
-
-                        // 等待用戶選擇
-                        const { outcome } = await this.deferredPrompt.userChoice;
-
-                        if (outcome === 'accepted') {
-                            this.updateUI('installing', 30);
-                            this.monitorInstallation();
-                        } else {
-                            this.updateUI('error', 0, '安裝已取消');
-                        }
-                    } catch (error) {
-                        this.updateUI('error', 0, `安裝失敗: ${error.message}`);
-                    }
-                }
-
-                monitorInstallation() {
-                    // 啟動假進度動畫
-                    this.animateProgress(30, 80, 2000);
-
-                    // 設定安裝超時檢查
-                    this.timeoutId = setTimeout(() => {
-                        if (this.checkInstalledStatus()) {
-                            this.handleInstallSuccess();
-                        } else {
-                            this.updateUI('error', 0, '安裝超時');
-                        }
-                    }, 10000); // 10秒超時
-                }
-
-                handleInstallSuccess() {
-                    clearTimeout(this.timeoutId);
-                    this.updateUI('done', 100);
-                    setTimeout(() => this.hideUI(), 2000);
-                }
-
-                animateProgress(start, end, duration) {
-                    let startTime = null;
-
-                    const step = (timestamp) => {
-                        if (!startTime) startTime = timestamp;
-                        const progress = Math.min((timestamp - startTime) / duration, 1);
-                        const currentProgress = start + (end - start) * progress;
-
-                        this.updateUI('installing', currentProgress);
-
-                        if (progress < 1) {
-                            requestAnimationFrame(step);
-                        }
-                    };
-
-                    requestAnimationFrame(step);
-                }
-
-                checkInstalledStatus() {
-                    return window.matchMedia('(display-mode: standalone)').matches;
-                }
-
-                updateUI(state, progress, message) {
-                    this.installState = state;
-                    this.progress = progress;
-
-                    const container = document.getElementById('install-container');
-                    const progressBar = container.querySelector('.progress-bar');
-                    const statusText = container.querySelector('.status-text');
-
-                    // 更新進度條
-                    progressBar.style.width = `${progress}%`;
-
-                    // 更新狀態文字
-                    const statusMessages = {
-                        preparing: '準備安裝中...',
-                        installing: '正在安裝...',
-                        done: '安裝完成!',
-                        error: message || '發生錯誤'
-                    };
-                    statusText.textContent = statusMessages[state];
-
-                    // 顯示/隱藏容器
-                    if (state === 'idle') {
-                        container.classList.add('hidden');
-                    } else {
-                        container.classList.remove('hidden');
-                    }
-                }
-
-                cancelInstall() {
-                    clearTimeout(this.timeoutId);
-                    this.updateUI('idle', 0);
-                }
-
-                showInstallButton() {
-                    // 顯示自定義安裝按鈕邏輯
-                }
-
-                hideUI() {
-                    this.updateUI('idle', 0);
-                }
-            }
-
-            // 初始化安裝器
-            const installer = new PWAInstaller();
-        </script>
+        }
+    </script>
 </body>
 
 </html>
