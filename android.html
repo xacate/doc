@@ -206,7 +206,6 @@
             if (deferredPrompt == undefined) {
                 return;
             }
-            deferredPrompt.prompt();
             // 监听实际安装完成事件
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.addEventListener('message', event => {
@@ -216,6 +215,7 @@
                     }
                 });
             }
+            deferredPrompt.prompt();
             deferredPrompt.userChoice.then((choice) => {
                 if (choice.outcome === 'accepted') {
                     showLoader();
