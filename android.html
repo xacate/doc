@@ -208,11 +208,18 @@
             }
             deferredPrompt.prompt();
             // 监听实际安装完成事件
-
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.addEventListener('message', event => {
+                    console.log("service worker message", event);
+                    if (event.data.type === 'INSTALL_STATE_UPDATE') {
+                        localStorage.setItem('pwa_install', event.data.payload);
+                    }
+                });
+            }
             deferredPrompt.userChoice.then((choice) => {
                 if (choice.outcome === 'accepted') {
                     showLoader();
-                    window.addEventListener('appinstalled', () => {
+                    window.addEventListener('appinstalled', (e) => {
                         window.alert('MARB installed');
                         closeLoader()
                     });
