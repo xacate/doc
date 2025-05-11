@@ -208,6 +208,13 @@
                     closeLoader()
                 }
             });
+            // 另一种监听方式（兼容旧浏览器）
+            navigator.serviceWorker.controller?.addEventListener('message', event => {
+                // 处理消息...
+                console.log("service worker message controller", event);
+                closeLoader()
+            });
+
         }
         function downloadClick() {
             if (!deferredPrompt) {
