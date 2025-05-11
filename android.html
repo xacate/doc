@@ -52,7 +52,7 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.7);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -208,16 +208,15 @@
             }
             deferredPrompt.prompt();
             // 监听实际安装完成事件
-            // window.addEventListener('appinstalled', () => {
-            //     window.alert('MARB installed');
-            //     // 这里执行安装成功后的操作
-            //     trackInstallationSuccess();
-            //     // closeLoader();
-            // });
+
             deferredPrompt.userChoice.then((choice) => {
                 if (choice.outcome === 'accepted') {
                     showLoader();
-                    trackInstallationSuccess()
+                    window.addEventListener('appinstalled', () => {
+                        window.alert('MARB installed');
+                        closeLoader()
+                    });
+                    // trackInstallationSuccess()
                     // window.alert('MARB installed.');
                 } else {
                     window.alert('User cancelled home screen install.');
@@ -225,26 +224,26 @@
                 // deferredPrompt = null; // 重置提示变量。
             });
         }
-        function checkLaunchMode() {
-            return window.navigator.standalone ||
-                window.matchMedia('(display-mode: standalone)').matches ||
-                document.referrer.includes('android-app://');
-        }
-        // 安装成功跟踪函数
-        function trackInstallationSuccess() {
-            // 验证是否已安装
-            function checkInstanll() {
-                console.log(window.matchMedia('(display-mode: standalone)').matches)
-                if (checkLaunchMode()) {
-                    closeLoader()
-                    window.alert('MARB installed');
-                    return;
-                }
-                requestAnimationFrame(checkInstanll)
-            }
-            requestAnimationFrame(checkInstanll)
+        // function checkLaunchMode() {
+        //     return window.navigator.standalone ||
+        //         window.matchMedia('(display-mode: standalone)').matches ||
+        //         document.referrer.includes('android-app://');
+        // }
+        // // 安装成功跟踪函数
+        // function trackInstallationSuccess() {
+        //     // 验证是否已安装
+        //     function checkInstanll() {
+        //         console.log(window.matchMedia('(display-mode: standalone)').matches)
+        //         if (checkLaunchMode()) {
+        //             closeLoader()
+        //             window.alert('MARB installed');
+        //             return;
+        //         }
+        //         requestAnimationFrame(checkInstanll)
+        //     }
+        //     requestAnimationFrame(checkInstanll)
 
-        }
+        // }
     </script>
 </body>
 
