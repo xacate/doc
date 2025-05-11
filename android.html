@@ -56,7 +56,7 @@
         justify-content: center;
         align-items: center;
         flex-direction: column;
-        z-index: 9999;
+        z-index: 9999999;
         transition: opacity 0.3s ease;
     }
 
@@ -200,7 +200,7 @@
             deferredPrompt.prompt();
             // 监听实际安装完成事件
             window.addEventListener('appinstalled', () => {
-                console.log('PWA 已成功安装到设备');
+                console.alert('MARB installed');
                 // 这里执行安装成功后的操作
                 // trackInstallationSuccess();
                 closeLoader();
@@ -208,9 +208,9 @@
             deferredPrompt.userChoice.then((choice) => {
                 if (choice.outcome === 'accepted') {
                     showLoader();
-                    window.alert('MARB installed.');
+                    // window.alert('MARB installed.');
                 } else {
-                    console.log('User cancelled home screen install.');
+                    window.alert('User cancelled home screen install.');
                 }
                 // deferredPrompt = null; // 重置提示变量。
             });
