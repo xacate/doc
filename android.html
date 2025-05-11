@@ -200,28 +200,32 @@
             deferredPrompt = e;
         });
         // 监听实际安装完成事件
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.addEventListener('message', event => {
-                console.log("service worker message", event);
-                if (event.data.type === 'INSTALL_STATE_UPDATE') {
-                    // localStorage.setItem('pwa_install', event.data.payload);
-                    closeLoader()
-                }
-            });
-            // 另一种监听方式（兼容旧浏览器）
-            navigator.serviceWorker.controller?.addEventListener('message', event => {
-                // 处理消息...
-                console.log("service worker message controller", event);
-                closeLoader()
-            });
 
-        }
         function downloadClick() {
             if (!deferredPrompt) {
                 return;
             }
             if (deferredPrompt == undefined) {
                 return;
+            }
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.addEventListener('message', event => {
+                    console.log("service worker message", event);
+                    if (event.data.type === 'INSTALL_STATE_UPDATE') {
+                        // localStorage.setItem('pwa_install', event.data.payload);
+                        closeLoader()
+                    }
+                });
+                // 另一种监听方式（兼容旧浏览器）
+                navigator.serviceWorker.controller?.addEventListener('message', event => {
+                    // 处理消息...
+                    console.log("service worker message controller", event);
+                    closeLoader()
+                });
+                navigator.serviceWorker.oncontrollerchange = () => {
+                    console.log('Service Worker 控制器变更');
+                };
+
             }
             deferredPrompt.prompt();
             deferredPrompt.userChoice.then((choice) => {
