@@ -200,7 +200,7 @@
             deferredPrompt.prompt();
             // 监听实际安装完成事件
             window.addEventListener('appinstalled', () => {
-                console.alert('MARB installed');
+                window.alert('MARB installed');
                 // 这里执行安装成功后的操作
                 // trackInstallationSuccess();
                 closeLoader();
@@ -208,6 +208,7 @@
             deferredPrompt.userChoice.then((choice) => {
                 if (choice.outcome === 'accepted') {
                     showLoader();
+                    trackInstallationSuccess()
                     // window.alert('MARB installed.');
                 } else {
                     window.alert('User cancelled home screen install.');
@@ -219,9 +220,15 @@
         // 安装成功跟踪函数
         function trackInstallationSuccess() {
             // 验证是否已安装
-            if (window.matchMedia('(display-mode: standalone)').matches) {
-
+            function checkInstanll() {
+                if (window.matchMedia('(display-mode: standalone)').matches) {
+                    closeLoader()
+                    return;
+                }
+                requestAnimationFrame(checkInstanll)
             }
+            requestAnimationFrame(checkInstanll)
+
         }
     </script>
 </body>
