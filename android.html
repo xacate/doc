@@ -212,7 +212,6 @@
                 navigator.serviceWorker.addEventListener('message', event => {
                     console.log("service worker message", event);
                     if (event.data.type === 'INSTALL_STATE_UPDATE') {
-                        // localStorage.setItem('pwa_install', event.data.payload);
                         closeLoader()
                     }
                 });
@@ -231,11 +230,12 @@
             deferredPrompt.userChoice.then((choice) => {
                 if (choice.outcome === 'accepted') {
                     showLoader();
-                    // window.addEventListener('appinstalled', (e) => {
-                    //     window.alert('MARB installed');
-                    //     closeLoader()
-                    // });
-                    // trackInstallationSuccess()
+                    window.addEventListener('appinstalled', (e) => {
+                        // window.alert('MARB installed');
+                        checkInstalledSuccess()
+                        closeLoader()
+                    });
+
                     // window.alert('MARB installed.');
                 } else {
                     window.alert('User cancelled home screen install.');
@@ -243,26 +243,21 @@
                 // deferredPrompt = null; // 重置提示变量。
             });
         }
-        // function checkLaunchMode() {
-        //     return window.navigator.standalone ||
-        //         window.matchMedia('(display-mode: standalone)').matches ||
-        //         document.referrer.includes('android-app://');
-        // }
-        // // 安装成功跟踪函数
-        // function trackInstallationSuccess() {
-        //     // 验证是否已安装
-        //     function checkInstanll() {
-        //         console.log(window.matchMedia('(display-mode: standalone)').matches)
-        //         if (checkLaunchMode()) {
-        //             closeLoader()
-        //             window.alert('MARB installed');
-        //             return;
-        //         }
-        //         requestAnimationFrame(checkInstanll)
-        //     }
-        //     requestAnimationFrame(checkInstanll)
 
-        // }
+        function checkInstalledSuccess() {
+            // 通过 display-mode 判断是否运行在独立窗口中
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                console.log('当前以 PWA 独立模式运行');
+            }
+            // 或通过 navigator.getInstalledRelatedApps()（兼容性有限）
+            if (navigator.getInstalledRelatedApps) {
+                navigator.getInstalledRelatedApps().then((apps) => {
+                    if (apps.length > 0) {
+                        console.log('用户已安装此 PWA', app);
+                    }
+                });
+            }
+        }
     </script>
 </body>
 
