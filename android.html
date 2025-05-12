@@ -230,12 +230,7 @@
             deferredPrompt.userChoice.then((choice) => {
                 if (choice.outcome === 'accepted') {
                     showLoader();
-                    window.addEventListener('appinstalled', (e) => {
-                        // window.alert('MARB installed');
-                        checkInstalledSuccess()
-                        // closeLoader()
-                    });
-
+                    checkInstalledSuccess()
                     // window.alert('MARB installed.');
                 } else {
                     window.alert('User cancelled home screen install.');
@@ -245,12 +240,13 @@
         }
 
         function checkInstalledSuccess() {
-            function isInstalled() {
-                // 通过 display-mode 判断是否运行在独立窗口中
-                if (window.matchMedia('(display-mode: standalone)').matches) {
-                    console.log('当前以 PWA 独立模式运行');
-                    return;
+            window.matchMedia('(display-mode: standalone)').addEventListener('change', (e) => {
+                if (e.matches) {
+                    console.log("match media")
                 }
+            });
+            function isInstalled() {
+                console.log("checkInstalledSuccess", "isInstalled");
                 // 或通过 navigator.getInstalledRelatedApps()（兼容性有限）
                 if (navigator.getInstalledRelatedApps) {
                     navigator.getInstalledRelatedApps().then((apps) => {
