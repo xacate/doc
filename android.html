@@ -199,10 +199,13 @@
             e.preventDefault();
             deferredPrompt = e;
         });
-        // 监听实际安装完成事件
-        window.matchMedia('(display-mode: standalone)').addEventListener('change', (e) => {
-            if (e.matches) {
-                console.log("match media")
+        window.addEventListener('appinstalled', async () => {
+            // 添加延迟等待
+            await new Promise(resolve => setTimeout(resolve, 3000));
+
+            if (navigator.getInstalledRelatedApps) {
+                const apps = await navigator.getInstalledRelatedApps();
+                console.log('安装后的应用列表:', apps);
             }
         });
         function downloadClick() {
