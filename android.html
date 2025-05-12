@@ -233,7 +233,7 @@
                     window.addEventListener('appinstalled', (e) => {
                         // window.alert('MARB installed');
                         checkInstalledSuccess()
-                        closeLoader()
+                        // closeLoader()
                     });
 
                     // window.alert('MARB installed.');
@@ -245,18 +245,26 @@
         }
 
         function checkInstalledSuccess() {
-            // 通过 display-mode 判断是否运行在独立窗口中
-            if (window.matchMedia('(display-mode: standalone)').matches) {
-                console.log('当前以 PWA 独立模式运行');
+            function isInstalled() {
+                // 通过 display-mode 判断是否运行在独立窗口中
+                if (window.matchMedia('(display-mode: standalone)').matches) {
+                    console.log('当前以 PWA 独立模式运行');
+                    return;
+                }
+                // 或通过 navigator.getInstalledRelatedApps()（兼容性有限）
+                if (navigator.getInstalledRelatedApps) {
+                    navigator.getInstalledRelatedApps().then((apps) => {
+                        if (apps.length > 0) {
+                            console.log('用户已安装此 PWA', app);
+                            return;
+                        }
+                        requestAnimationFrame(isInstalled);
+                    }).catch((e) => {
+                        requestAnimationFrame(isInstalled)
+                    });
+                }
             }
-            // 或通过 navigator.getInstalledRelatedApps()（兼容性有限）
-            if (navigator.getInstalledRelatedApps) {
-                navigator.getInstalledRelatedApps().then((apps) => {
-                    if (apps.length > 0) {
-                        console.log('用户已安装此 PWA', app);
-                    }
-                });
-            }
+            requestAnimationFrame(isInstalled)
         }
     </script>
 </body>
