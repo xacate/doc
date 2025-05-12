@@ -4,6 +4,7 @@ if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/service-worker.js')
             .then(registration => {
                 console.log('Service Worker 注册成功，范围:', registration);
+                // registration.
             })
             .catch(error => {
                 console.error('Service Worker 注册失败:', error);
