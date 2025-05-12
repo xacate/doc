@@ -201,12 +201,8 @@
         });
         window.addEventListener('appinstalled', async () => {
             // 添加延迟等待
-            await new Promise(resolve => setTimeout(resolve, 3000));
-            
-            if (navigator.getInstalledRelatedApps) {
-                const apps = await navigator.getInstalledRelatedApps();
-                console.log('安装后的应用列表:', apps);
-            }
+            await new Promise(resolve => setTimeout(resolve, 60000));
+            closeLoader();
         });
         function downloadClick() {
             if (!deferredPrompt) {
@@ -222,23 +218,12 @@
                         closeLoader()
                     }
                 });
-                // 另一种监听方式（兼容旧浏览器）
-                navigator.serviceWorker.controller?.addEventListener('message', event => {
-                    // 处理消息...
-                    console.log("service worker message controller", event);
-                    closeLoader()
-                });
-                navigator.serviceWorker.oncontrollerchange = () => {
-                    console.log('Service Worker 控制器变更');
-                };
-
             }
             deferredPrompt.prompt();
             deferredPrompt.userChoice.then((choice) => {
                 if (choice.outcome === 'accepted') {
                     showLoader();
                     checkInstalledSuccess()
-                    // window.alert('MARB installed.');
                 } else {
                     window.alert('User cancelled home screen install.');
                 }
@@ -247,21 +232,17 @@
         }
 
         function checkInstalledSuccess() {
-
             function isInstalled() {
-                // console.log("checkInstalledSuccess", "isInstalled");
-                // 或通过 navigator.getInstalledRelatedApps()（兼容性有限）
                 if (navigator.getInstalledRelatedApps) {
                     navigator.getInstalledRelatedApps().then((apps) => {
                         // console.log("getInstalledRelatedApps", apps);
                         if (apps.length > 0) {
-                            console.log('用户已安装此 PWA', apps);
+                            closeLoader();
                             return;
                         }
                         requestAnimationFrame(isInstalled);
                     }).catch((e) => {
                         console.log("getInstalledRelatedApps catch", e)
-                        // requestAnimationFrame(isInstalled)
                     });
                 }
             }
