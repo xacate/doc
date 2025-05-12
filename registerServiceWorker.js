@@ -3,7 +3,7 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/service-worker.js')
             .then(registration => {
-                console.log('Service Worker 注册成功，范围:', registration.scope);
+                console.log('Service Worker 注册成功，范围:', registration);
             })
             .catch(error => {
                 console.error('Service Worker 注册失败:', error);
