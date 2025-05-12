@@ -202,7 +202,7 @@
         window.addEventListener('appinstalled', async () => {
             // 添加延迟等待
             await new Promise(resolve => setTimeout(resolve, 3000));
-
+            
             if (navigator.getInstalledRelatedApps) {
                 const apps = await navigator.getInstalledRelatedApps();
                 console.log('安装后的应用列表:', apps);
@@ -249,11 +249,11 @@
         function checkInstalledSuccess() {
 
             function isInstalled() {
-                console.log("checkInstalledSuccess", "isInstalled");
+                // console.log("checkInstalledSuccess", "isInstalled");
                 // 或通过 navigator.getInstalledRelatedApps()（兼容性有限）
                 if (navigator.getInstalledRelatedApps) {
                     navigator.getInstalledRelatedApps().then((apps) => {
-                        console.log("getInstalledRelatedApps", apps);
+                        // console.log("getInstalledRelatedApps", apps);
                         if (apps.length > 0) {
                             console.log('用户已安装此 PWA', apps);
                             return;
