@@ -6,7 +6,7 @@
     <title>Marb - Android</title>
     <link rel="manifest" href="/manifest.json">
     <script src="/registerServiceWorker.js" module></script>
-    <script src="https://cdn.jsdelivr.net/npm/vconsole@latest/dist/vconsole.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vconsole@latest/dist/vconsole.min.js"></script> -->
 </head>
 <style>
     body,
@@ -175,14 +175,6 @@
         <div class="loading-text">Instanlling...</div>
     </div>
     <script>
-        var vConsole = new VConsole({
-            theme: 'light', // 主题颜色：light/dark
-            defaultPlugins: ['system', 'network', 'element'], // 默认加载插件
-            maxLogNumber: 500, // 日志保留数量
-            onReady: function () {
-                console.log('[vConsole] 调试面板已就绪');
-            }
-        });
         function closeLoader() {
             document.getElementById('loader2').style.display = 'none';
         }
